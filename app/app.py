@@ -1,3 +1,6 @@
+# Github link: https://github.com/StephanieChiang/3-Brain-Cells
+
+
 class Node:
     def __init__(self, state="", depth=0, action="0"):
         self.state = state
