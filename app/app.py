@@ -1,5 +1,5 @@
 # Github link: https://github.com/StephanieChiang/3-Brain-Cells
-
+# Reference: COMP 472 State Space Search Lecture Slides (p.29)
 
 class Node:
     def __init__(self, state="", depth=0, action="0"):
