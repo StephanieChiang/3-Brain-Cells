@@ -164,3 +164,44 @@ def dfs(size, max_depth, values):
     answer = (found, [solution, search_path])
 
     return answer
+
+
+def start():
+    f = open("input.txt", "r")
+    counter = 0
+
+    for x in f:
+        commands = x.split()
+        size = int(commands[0])
+        max_depth = int(commands[1])
+        max_search = int(commands[2])
+        values = commands[3]
+
+        results = dfs(size, max_depth, values)
+        file_name = str(counter) + "_dfs_solution.txt"
+
+        f = open(file_name, "w")
+
+        if results[0]:
+            for i in results[1][0]:
+                f.write(i.action + " " + i.state + "\n")
+
+            f.close()
+        else:
+            f.write("no solution")
+
+        file_name = str(counter) + "_dfs_search.txt"
+
+        f = open(file_name, "w")
+
+        for i in results[1][1]:
+            f.write("0 0 0 " + i.state + "\n")
+
+        f.close()
+
+        counter += 1
+
+
+# ------------------ Start code here ------------------
+
+start()
