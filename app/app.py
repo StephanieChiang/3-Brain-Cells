@@ -5,6 +5,7 @@ class Node:
         self.depth = depth
         self.action = action
 
+
 def print_board(size, values_string):
     values = list(values_string)
     counter = 0
@@ -107,3 +108,59 @@ def unique_states(children, open_list, closed_list):
             filtered_states.append(i)
 
     return filtered_states
+
+
+def dfs(size, max_depth, values):
+    start_node = Node(values, 1, "0")
+    open_list = [start_node]
+    closed_list = []
+    solution = []
+    search_path = []
+    found = False
+
+    while open_list:
+        current_state = open_list.pop(0)
+        search_path.append(current_state)
+
+        if len(solution) != 0:
+            last = solution[-1]
+
+            if current_state.depth < last.depth:
+                new_solution = []
+                for i in solution:
+                    if i.depth < current_state.depth:
+                        new_solution.append(i)
+
+                solution = new_solution
+
+        solution.append(current_state)
+
+        if all(s == "0" for s in current_state.state):
+            found = True
+            break
+        else:
+
+            if current_state.depth < max_depth:
+                new_boards = generate_options(size, current_state)
+
+                closed_list.append(current_state)
+
+                unique_boards = unique_states(new_boards, open_list, closed_list)
+
+                unique_boards.sort(key=lambda x: x.state)
+
+                open_list = unique_boards + open_list
+
+    if all(s == "0" for s in current_state.state):
+        print("Search complete")
+
+        print("final board")
+
+        print_board(size, current_state.state)
+    else:
+        print("No solution found")
+        solution = ["no solution"]
+
+    answer = (found, [solution, search_path])
+
+    return answer
