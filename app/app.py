@@ -1,5 +1,5 @@
 # Github link: https://github.com/StephanieChiang/3-Brain-Cells
-# Reference: COMP 472 State Space Search Lecture Slides (p.29)
+# Reference: COMP 472 State Space Search Lecture Slides
 
 class Node:
     def __init__(self, state="", depth=0, action="0", path=[], f=0, g=0, h=0):
@@ -194,14 +194,19 @@ def dfs(size, max_depth, values):
     return answer
 
 
-def bfs(size, max_search, values):
-    start_node = Node(values, 1, "0")
+def search_informed(size, max_search, values, a_star):
+    start_node = Node(values, 1, "0", ["0 " + values])
 
     split_string = list(start_node.state)
     h = split_string.count("1")
 
-    start_node.h = h
-    start_node.f = h
+    if a_star:
+        start_node.h = h
+        start_node.g = start_node.depth-1
+        start_node.f = h + start_node.depth-1
+    else:
+        start_node.h = h
+        start_node.f = h
 
     open_list = [start_node]
     closed_list = []
@@ -224,9 +229,14 @@ def bfs(size, max_search, values):
 
                 unique_boards = unique_states(new_boards, open_list, closed_list)
 
-                boards_heuristic = heuristic_bfs(unique_boards)
-                open_list = boards_heuristic + open_list
-                open_list.sort(key=lambda x: (x.h, x.state))
+                if a_star:
+                    boards_heuristic = heuristic_a_star(unique_boards)
+                    open_list = boards_heuristic + open_list
+                    open_list.sort(key=lambda x: (x.f, x.state))
+                else:
+                    boards_heuristic = heuristic_bfs(unique_boards)
+                    open_list = boards_heuristic + open_list
+                    open_list.sort(key=lambda x: (x.h, x.state))
 
             else:
                 break
@@ -239,11 +249,33 @@ def bfs(size, max_search, values):
         print_board(size, current_state.state)
     else:
         print("No solution found")
+
         solution = ["no solution"]
 
     answer = (found, [solution, search_path])
 
     return answer
+
+
+def write_solution(file_name, results):
+    f = open(file_name, "w")
+
+    if results[0]:
+        for i in results[1][0]:
+            f.write(i + "\n")
+
+        f.close()
+    else:
+        f.write("no solution")
+
+
+def write_search(file_name, results):
+    f = open(file_name, "w")
+
+    for i in results[1][1]:
+        f.write("{} {} {} {} \n".format(i.f, i.g, i.h, i.state))
+
+    f.close()
 
 
 def start():
@@ -257,27 +289,23 @@ def start():
         max_search = int(commands[2])
         values = commands[3]
 
-        results = dfs(size, max_depth, values)
+        results_dfs = dfs(size, max_depth, values)
         file_name = str(counter) + "_dfs_solution.txt"
-
-        f = open(file_name, "w")
-
-        if results[0]:
-            for i in results[1][0]:
-                f.write(i.action + " " + i.state + "\n")
-
-            f.close()
-        else:
-            f.write("no solution")
-
+        write_solution(file_name, results_dfs)
         file_name = str(counter) + "_dfs_search.txt"
+        write_search(file_name, results_dfs)
 
-        f = open(file_name, "w")
+        results_bfs = search_informed(size, max_search, values, False)
+        file_name = str(counter) + "_bfs_solution.txt"
+        write_solution(file_name, results_bfs)
+        file_name = str(counter) + "_bfs_search.txt"
+        write_search(file_name, results_bfs)
 
-        for i in results[1][1]:
-            f.write("0 0 0 " + i.state + "\n")
-
-        f.close()
+        results_astar = search_informed(size, max_search, values, True)
+        file_name = str(counter) + "_astar_solution.txt"
+        write_solution(file_name, results_astar)
+        file_name = str(counter) + "_astar_search.txt"
+        write_search(file_name, results_astar)
 
         counter += 1
 
