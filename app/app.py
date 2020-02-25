@@ -2,11 +2,15 @@
 # Reference: COMP 472 State Space Search Lecture Slides (p.29)
 
 class Node:
-    def __init__(self, state="", depth=0, action="0"):
+    def __init__(self, state="", depth=0, action="0", path=[], f=0, g=0, h=0):
         self.state = state
         self.isVisited = False
         self.depth = depth
         self.action = action
+        self.path = path
+        self.f = f
+        self.g = g
+        self.h = h
 
 
 def print_board(size, values_string):
@@ -57,6 +61,27 @@ def get_position(row, col):
     position += letter + str(number)
 
     return position
+
+
+def heuristic_bfs(boards):
+    for i in boards:
+        split_string = list(i.state)
+        h = split_string.count("1")
+        i.h = h
+        i.f = h
+
+    return boards
+
+
+def heuristic_a_star(boards):
+    for i in boards:
+        split_string = list(i.state)
+        h = split_string.count("1")
+        i.h = h
+        i.g = i.depth-1
+        i.f = h + i.depth-1
+
+    return boards
 
 
 def generate_options(size, current_state):
