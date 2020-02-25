@@ -78,8 +78,8 @@ def heuristic_a_star(boards):
         split_string = list(i.state)
         h = split_string.count("1")
         i.h = h
-        i.g = i.depth-1
-        i.f = h + i.depth-1
+        i.g = i.depth - 1
+        i.f = h + i.depth - 1
 
     return boards
 
@@ -178,6 +178,58 @@ def dfs(size, max_depth, values):
                 unique_boards.sort(key=lambda x: x.state)
 
                 open_list = unique_boards + open_list
+
+    if all(s == "0" for s in current_state.state):
+        print("Search complete")
+
+        print("final board")
+
+        print_board(size, current_state.state)
+    else:
+        print("No solution found")
+        solution = ["no solution"]
+
+    answer = (found, [solution, search_path])
+
+    return answer
+
+
+def bfs(size, max_search, values):
+    start_node = Node(values, 1, "0")
+
+    split_string = list(start_node.state)
+    h = split_string.count("1")
+
+    start_node.h = h
+    start_node.f = h
+
+    open_list = [start_node]
+    closed_list = []
+    search_path = []
+    found = False
+
+    while open_list:
+        current_state = open_list.pop(0)
+        search_path.append(current_state)
+
+        if all(s == "0" for s in current_state.state):
+            found = True
+            break
+        else:
+
+            if len(search_path) < max_search:
+                new_boards = generate_options(size, current_state)
+
+                closed_list.append(current_state)
+
+                unique_boards = unique_states(new_boards, open_list, closed_list)
+
+                boards_heuristic = heuristic_bfs(unique_boards)
+                open_list = boards_heuristic + open_list
+                open_list.sort(key=lambda x: (x.h, x.state))
+
+            else:
+                break
 
     if all(s == "0" for s in current_state.state):
         print("Search complete")
